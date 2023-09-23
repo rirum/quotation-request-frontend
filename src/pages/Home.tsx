@@ -29,8 +29,8 @@ export default function Home() {
               <p>orçamento</p>
             </Link>
             <p>|</p>
-            <Link to="/contato" style={{ textDecoration: 'none' }}>
-              <p>contato</p>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <p>login</p>
             </Link>
           </Paragraph>
         </WrapperText>

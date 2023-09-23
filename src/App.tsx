@@ -3,10 +3,24 @@ import styled from 'styled-components';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Quotation from './pages/Quotation';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <>
+      <ToastContainer
+        position="top-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <BrowserRouter>
         <ContainerApp>
           <Routes>
@@ -33,5 +47,4 @@ const ContainerApp = styled.div`
   margin: 0px;
   padding: 0px;
   font-family: 'Karla', sans-serif;
-  color: #fff;
 `;
