@@ -1,28 +1,75 @@
 import styled from 'styled-components';
 import LogoStereolab from '../assets/logo_stereolab.png';
 import React, { useState } from 'react';
-export default function Quotation() {
-  const [imagens, setImagens] = useState<string[]>([]);
+
+function ImageUpload() {
+  const [imagens, setImagens] = useState<File[]>([]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const imagensArray: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const result = event.target?.result;
-          if (typeof result === 'string') {
-            imagensArray.push(result);
-            if (imagensArray.length === files.length) {
-              setImagens([...imagens, ...imagensArray]);
-            }
-          }
-        };
-        reader.readAsDataURL(files[i]);
-      }
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setImagens([...imagens, ...files]);
     }
   };
+
+  const excluirImagem = (index: number) => {
+    const novasImagens = [...imagens];
+    novasImagens.splice(index, 1);
+    setImagens(novasImagens);
+  };
+
+  return (
+    <StyledImageUpload>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleImageUpload}
+      />
+      <Thumbnail>
+        {imagens.map((imagem, index) => (
+          <div key={index}>
+            <img src={URL.createObjectURL(imagem)} alt={`Imagem ${index}`} />
+            <button onClick={() => excluirImagem(index)}>x</button>
+          </div>
+        ))}
+      </Thumbnail>
+    </StyledImageUpload>
+  );
+}
+
+const StyledImageUpload = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  input {
+  }
+`;
+
+const Thumbnail = styled.div`
+  width: 500px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 40px;
+
+  img {
+    width: 100px;
+  }
+  button {
+    border-radius: 50%;
+    background-color: #565656;
+    border: 0 solid;
+    color: white;
+    margin-right: 10px;
+  }
+`;
+
+export default function Quotation() {
   return (
     <>
       <Background>
@@ -48,7 +95,23 @@ export default function Quotation() {
             </NumberData>
           </QuotationHeader>
 
-          <RegistrationData></RegistrationData>
+          <RegistrationData>
+            <InputDataMedium>
+              <p>Nome | Telefone:</p>
+              <input></input>
+            </InputDataMedium>
+
+            <InputDataMedium>
+              <p>Email ou Whatsapp:</p>
+              <input></input>
+            </InputDataMedium>
+
+            <InputDataMedium>
+              <p>Endereço:</p>
+              <input></input>
+            </InputDataMedium>
+          </RegistrationData>
+          <hr></hr>
           <Description>
             <TitleBox>
               <p>Descrição do orçamento</p>
@@ -63,18 +126,7 @@ export default function Quotation() {
             <TitleBox>
               <p>Preview do Projeto</p>
             </TitleBox>
-            <ImageUpload>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-              />
-              {imagens.map((imagem, index) => (
-                <img key={index} src={imagem} alt={`Imagem ${index}`} />
-              ))}
-              {/* Outro conteúdo do documento */}
-            </ImageUpload>
+            <ImageUpload />
           </Preview>
           <Payment>
             <TitleBox>
@@ -131,8 +183,25 @@ const InputData = styled.div`
 
 const RegistrationData = styled.div`
   background-color: aliceblue;
+  height: 80px;
+  align-content: center;
+`;
 
-  height: 150px;
+const InputDataMedium = styled.div`
+  width: 580px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  input {
+    width: 450px;
+    margin-bottom: 5px;
+  }
+  p {
+    width: 130px;
+    font-size: 12px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
 `;
 
 const TitleBox = styled.div`
@@ -172,7 +241,7 @@ const InputMedium = styled.textarea`
 
 const Description = styled.div`
   background-color: yellow;
-  height: 250px;
+  height: 200px;
 `;
 
 const Preview = styled.div`
@@ -180,22 +249,6 @@ const Preview = styled.div`
   height: 450px;
 `;
 
-const ImageUpload = styled.div`
-  border: 1px solid #565656;
-  width: 580px;
-  height: 250px;
-
-  position: absolute;
-  margin-left: 10px;
-  margin-top: 5px;
-  input {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    align-items: center;
-  }
-`;
 const Payment = styled.div`
   background-color: paleturquoise;
   height: 240px;
@@ -221,4 +274,12 @@ const Background = styled.div`
   min-height: 100vh;
   background-color: #292826;
   font-family: 'Inconsolata', sans-serif;
+  hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+  }
 `;
