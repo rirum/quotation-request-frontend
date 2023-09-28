@@ -3,6 +3,7 @@ import LogoStereolab from '../assets/logo_stereolab.png';
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import CheckboxGroup from '../components/Checkbox';
 
 function ImageUpload() {
   const [imagens, setImagens] = useState<File[]>([]);
@@ -109,6 +110,7 @@ export default function Quotation() {
       pdf.save('documento.pdf');
     });
   };
+
   return (
     <>
       <div ref={pdfRef}>
@@ -144,7 +146,7 @@ export default function Quotation() {
 
               <InputDataMedium>
                 <p>Email ou Whatsapp:</p>
-                <input></input>
+                <input placeholder="ex: teste@teste.com.br ou 41 99999-9999"></input>
               </InputDataMedium>
 
               <InputDataMedium>
@@ -174,12 +176,14 @@ export default function Quotation() {
                 <p>Valor total | Formas de pagamento</p>
               </TitleBox>
 
-              <InputMedium
+              <InputSmall
                 placeholder="Digite aqui para editar |  Valor total do projeto/serviço e formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
                 rows={4}
                 cols={50}
-              ></InputMedium>
+              ></InputSmall>
             </Payment>
+
+            <CheckboxGroup />
           </QuotationBackground>
           <StyledButton onClick={generatePDF}>
             {' '}
@@ -294,6 +298,9 @@ const InputMedium = styled.textarea`
   margin: 0 auto;
   margin-top: 5px;
   position: relative;
+
+  overflow: auto;
+
   &::placeholder {
     position: absolute;
     top: 30%;
@@ -310,12 +317,32 @@ const Description = styled.div`
 
 const Preview = styled.div`
   background-color: palegreen;
-  height: 450px;
+  height: 500px;
 `;
 
 const Payment = styled.div`
   background-color: paleturquoise;
-  height: 240px;
+  height: 200px;
+`;
+
+const InputSmall = styled.textarea`
+  min-height: 50px;
+  width: 574px;
+  display: flex;
+  font-family: 'Inconsolata', sans-serif;
+  margin: 0 auto;
+  margin-top: 5px;
+  position: relative;
+
+  overflow: auto;
+
+  &::placeholder {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-20%, -10%);
+    font-size: 12px;
+  }
 `;
 
 const QuotationBackground = styled.div`
