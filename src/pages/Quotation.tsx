@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import LogoStereolab from '../assets/logo_stereolab.png';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 function ImageUpload() {
   const [imagens, setImagens] = useState<File[]>([]);
@@ -12,7 +14,7 @@ function ImageUpload() {
     }
   };
 
-  const excluirImagem = (index: number) => {
+  const deleteImage = (index: number) => {
     const novasImagens = [...imagens];
     novasImagens.splice(index, 1);
     setImagens(novasImagens);
@@ -30,7 +32,7 @@ function ImageUpload() {
         {imagens.map((imagem, index) => (
           <div key={index}>
             <img src={URL.createObjectURL(imagem)} alt={`Imagem ${index}`} />
-            <button onClick={() => excluirImagem(index)}>x</button>
+            <button onClick={() => deleteImage(index)}>x</button>
           </div>
         ))}
       </Thumbnail>
@@ -70,77 +72,121 @@ const Thumbnail = styled.div`
 `;
 
 export default function Quotation() {
+  const pdfRef = useRef(null);
+
+  const generatePDF = async () => {
+    const quotationBackground = document.getElementById('QuotationBackground');
+
+    if (!quotationBackground) {
+      console.error('A div QuotationBackground não foi encontrada.');
+      return;
+    }
+
+    const waitForImages = Array.from(
+      quotationBackground.querySelectorAll('img')
+    ).map(
+      (img: HTMLImageElement) =>
+        new Promise<void>((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = () => resolve();
+          }
+        })
+    );
+
+    await Promise.all(waitForImages);
+
+    html2canvas(quotationBackground).then((canvas) => {
+      const imgData = canvas.toDataURL('image/jpeg', 1);
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a5',
+      });
+      pdf.addImage(imgData, 'JPEG', 0, 0, 148, 210);
+      pdf.save('documento.pdf');
+    });
+  };
   return (
     <>
-      <Background>
-        <QuotationBackground>
-          <QuotationHeader>
-            <Logo>
-              <img src={LogoStereolab} alt="logo-stereolab"></img>
-            </Logo>
-            <NumberData>
-              <WrapperInput>
-                <form>
-                  <InputData>
-                    <p>Número do orçamento:</p>
-                    <input></input>
-                  </InputData>
+      <div ref={pdfRef}>
+        <Background>
+          <Block></Block>
+          <QuotationBackground id="QuotationBackground">
+            <QuotationHeader>
+              <Logo>
+                <img src={LogoStereolab} alt="logo-stereolab"></img>
+              </Logo>
+              <NumberData>
+                <WrapperInput>
+                  <form>
+                    <InputData>
+                      <p>Número do orçamento:</p>
+                      <input></input>
+                    </InputData>
 
-                  <InputData>
-                    <p>Data do orçamento:</p>
-                    <input></input>
-                  </InputData>
-                </form>
-              </WrapperInput>
-            </NumberData>
-          </QuotationHeader>
+                    <InputData>
+                      <p>Data do orçamento:</p>
+                      <input></input>
+                    </InputData>
+                  </form>
+                </WrapperInput>
+              </NumberData>
+            </QuotationHeader>
 
-          <RegistrationData>
-            <InputDataMedium>
-              <p>Nome | Telefone:</p>
-              <input></input>
-            </InputDataMedium>
+            <RegistrationData>
+              <InputDataMedium>
+                <p>Nome | Telefone:</p>
+                <input></input>
+              </InputDataMedium>
 
-            <InputDataMedium>
-              <p>Email ou Whatsapp:</p>
-              <input></input>
-            </InputDataMedium>
+              <InputDataMedium>
+                <p>Email ou Whatsapp:</p>
+                <input></input>
+              </InputDataMedium>
 
-            <InputDataMedium>
-              <p>Endereço:</p>
-              <input></input>
-            </InputDataMedium>
-          </RegistrationData>
-          <hr></hr>
-          <Description>
-            <TitleBox>
-              <p>Descrição do orçamento</p>
-            </TitleBox>
-            <InputMedium
-              placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
-              rows={4}
-              cols={50}
-            ></InputMedium>
-          </Description>
-          <Preview>
-            <TitleBox>
-              <p>Preview do Projeto</p>
-            </TitleBox>
-            <ImageUpload />
-          </Preview>
-          <Payment>
-            <TitleBox>
-              <p>Valor total | Formas de pagamento</p>
-            </TitleBox>
+              <InputDataMedium>
+                <p>Endereço:</p>
+                <input></input>
+              </InputDataMedium>
+            </RegistrationData>
+            <hr></hr>
+            <Description>
+              <TitleBox>
+                <p>Descrição do orçamento</p>
+              </TitleBox>
+              <InputMedium
+                placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
+                rows={4}
+                cols={50}
+              ></InputMedium>
+            </Description>
+            <Preview>
+              <TitleBox>
+                <p>Preview do Projeto</p>
+              </TitleBox>
+              <ImageUpload />
+            </Preview>
+            <Payment>
+              <TitleBox>
+                <p>Valor total | Formas de pagamento</p>
+              </TitleBox>
 
-            <InputMedium
-              placeholder="Digite aqui para editar |  Valor total do projeto/serviço e formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
-              rows={4}
-              cols={50}
-            ></InputMedium>
-          </Payment>
-        </QuotationBackground>
-      </Background>
+              <InputMedium
+                placeholder="Digite aqui para editar |  Valor total do projeto/serviço e formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
+                rows={4}
+                cols={50}
+              ></InputMedium>
+            </Payment>
+          </QuotationBackground>
+          <StyledButton onClick={generatePDF}>
+            {' '}
+            <p>BAIXAR PDF</p>
+          </StyledButton>
+        </Background>
+      </div>
     </>
   );
 }
@@ -160,7 +206,25 @@ const Logo = styled.div`
     margin-left: 20px;
   }
 `;
+const StyledButton = styled.div`
+  width: 600px;
+  height: 30px;
+  background-color: #fff;
+  border: 1px solid pink;
+  display: flex;
+  margin: 0 auto;
+  margin-top: 15px;
 
+  p {
+    margin: 0 auto;
+    margin-top: 5px;
+  }
+`;
+
+const Block = styled.div`
+  background-color: #292826;
+  height: 50px;
+`;
 const NumberData = styled.div`
   width: 50%;
   display: flex;
@@ -255,12 +319,9 @@ const Payment = styled.div`
 `;
 
 const QuotationBackground = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
+  margin-top: 15px;
+
+  margin: 0 auto;
   width: 600px;
   height: 800px;
   background-color: #fff;
@@ -275,7 +336,6 @@ const Background = styled.div`
   background-color: #292826;
   font-family: 'Inconsolata', sans-serif;
   hr {
-    display: block;
     height: 1px;
     border: 0;
     border-top: 1px solid #ccc;
