@@ -45,7 +45,7 @@ const StyledImageUpload = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 10px;
   input {
   }
 `;
@@ -57,10 +57,10 @@ const Thumbnail = styled.div`
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 20px;
 
   img {
-    width: 100px;
+    width: 150px;
   }
   button {
     border-radius: 50%;
@@ -138,7 +138,7 @@ export default function Quotation() {
 
             <RegistrationData>
               <InputDataMedium>
-                <p>Nome | Telefone:</p>
+                <p>Nome:</p>
                 <input></input>
               </InputDataMedium>
 
@@ -210,7 +210,7 @@ const StyledButton = styled.div`
   width: 600px;
   height: 30px;
   background-color: #fff;
-  border: 1px solid pink;
+  border: 1px solid #fff;
   display: flex;
   margin: 0 auto;
   margin-top: 15px;
