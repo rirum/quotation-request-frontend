@@ -4,6 +4,8 @@ import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import CheckboxGroup from '../components/Checkbox';
+import { postQuotation } from '../services/quotationApi';
+import { toast } from 'react-toastify';
 
 function ImageUpload() {
   const [imagens, setImagens] = useState<File[]>([]);
@@ -73,6 +75,19 @@ const Thumbnail = styled.div`
 `;
 
 export default function Quotation() {
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
+  const [description, setDescription] = useState('');
+  const [paymentValue, setPaymentValue] = useState('');
+  const [paymentTypeValue, setPaymentTypeValue] = useState('');
+  const quotationData = {
+    client_name: clientName,
+    client_email: clientEmail,
+    client_address: clientAddress,
+    quotation_description: description,
+    quotation_total_amount: paymentValue,
+  };
   const pdfRef = useRef(null);
 
   const generatePDF = async () => {
@@ -111,19 +126,28 @@ export default function Quotation() {
     });
   };
 
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      const post = await postQuotation(quotationData);
+      toast('Orçamento criado com sucesso');
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <div ref={pdfRef}>
         <Background>
           <Block></Block>
-          <QuotationBackground id="QuotationBackground">
-            <QuotationHeader>
-              <Logo>
-                <img src={LogoStereolab} alt="logo-stereolab"></img>
-              </Logo>
-              <NumberData>
-                <WrapperInput>
-                  <form>
+          <form onSubmit={submit}>
+            <QuotationBackground id="QuotationBackground">
+              <QuotationHeader>
+                <Logo>
+                  <img src={LogoStereolab} alt="logo-stereolab"></img>
+                </Logo>
+                <NumberData>
+                  <WrapperInput>
                     <InputData>
                       <p>Número do orçamento:</p>
                       <input></input>
@@ -133,62 +157,87 @@ export default function Quotation() {
                       <p>Data do orçamento:</p>
                       <input></input>
                     </InputData>
-                  </form>
-                </WrapperInput>
-              </NumberData>
-            </QuotationHeader>
+                  </WrapperInput>
+                </NumberData>
+              </QuotationHeader>
 
-            <RegistrationData>
-              <InputDataMedium>
-                <p>Nome:</p>
-                <input></input>
-              </InputDataMedium>
+              <CheckboxGroup />
 
-              <InputDataMedium>
-                <p>Email ou Whatsapp:</p>
-                <input placeholder="ex: teste@teste.com.br ou 41 99999-9999"></input>
-              </InputDataMedium>
+              <RegistrationData>
+                <InputDataMedium>
+                  <p>Nome:</p>
+                  <input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                  ></input>
+                </InputDataMedium>
 
-              <InputDataMedium>
-                <p>Endereço:</p>
-                <input></input>
-              </InputDataMedium>
-            </RegistrationData>
-            <hr></hr>
-            <Description>
-              <TitleBox>
-                <p>Descrição do orçamento</p>
-              </TitleBox>
-              <InputMedium
-                placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
-                rows={4}
-                cols={50}
-              ></InputMedium>
-            </Description>
-            <Preview>
-              <TitleBox>
-                <p>Preview do Projeto</p>
-              </TitleBox>
-              <ImageUpload />
-            </Preview>
-            <Payment>
-              <TitleBox>
-                <p>Valor total | Formas de pagamento</p>
-              </TitleBox>
+                <InputDataMedium>
+                  <p>Email ou Whatsapp:</p>
+                  <input
+                    type="text"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="ex: teste@teste.com.br ou 41 99999-9999"
+                  ></input>
+                </InputDataMedium>
 
-              <InputSmall
-                placeholder="Digite aqui para editar |  Valor total do projeto/serviço e formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
-                rows={4}
-                cols={50}
-              ></InputSmall>
-            </Payment>
+                <InputDataMedium>
+                  <p>Endereço:</p>
+                  <input
+                    type="text"
+                    value={clientAddress}
+                    onChange={(e) => setClientAddress(e.target.value)}
+                  ></input>
+                </InputDataMedium>
+              </RegistrationData>
 
-            <CheckboxGroup />
-          </QuotationBackground>
-          <StyledButton onClick={generatePDF}>
-            {' '}
-            <p>BAIXAR PDF</p>
-          </StyledButton>
+              <Description>
+                <TitleBox>
+                  <p>Descrição do orçamento</p>
+                </TitleBox>
+                <InputMedium
+                  placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
+                  rows={4}
+                  cols={50}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                ></InputMedium>
+              </Description>
+
+              <Preview>
+                <TitleBox>
+                  <p>Valor total</p>
+                </TitleBox>
+                <InputSmall
+                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
+                  rows={4}
+                  cols={50}
+                  value={paymentValue}
+                  onChange={(e) => setPaymentValue(e.target.value)}
+                ></InputSmall>
+              </Preview>
+              <Payment>
+                <TitleBox>
+                  <p>Formas de pagamento</p>
+                </TitleBox>
+
+                <InputSmall
+                  placeholder="Digite aqui para editar |  Formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
+                  rows={4}
+                  cols={50}
+                  value={paymentTypeValue}
+                  onChange={(e) => setPaymentTypeValue(e.target.value)}
+                ></InputSmall>
+              </Payment>
+            </QuotationBackground>
+
+            <StyledButton onClick={generatePDF}>
+              {' '}
+              <p>BAIXAR PDF E SALVAR NA DATABASE</p>
+            </StyledButton>
+          </form>
         </Background>
       </div>
     </>
@@ -312,12 +361,14 @@ const InputMedium = styled.textarea`
 
 const Description = styled.div`
   background-color: yellow;
-  height: 200px;
+  height: 500px;
 `;
 
 const Preview = styled.div`
   background-color: palegreen;
-  height: 500px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Payment = styled.div`

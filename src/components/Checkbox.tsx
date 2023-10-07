@@ -18,7 +18,7 @@ export default function CheckboxGroup() {
             checked={selectedOption === 'option1'}
             onChange={handleCheckboxChange}
           />{' '}
-          Venda
+          Orçamento
         </label>
       </CheckboxInput>
       <CheckboxInput>
@@ -29,7 +29,7 @@ export default function CheckboxGroup() {
             checked={selectedOption === 'option2'}
             onChange={handleCheckboxChange}
           />{' '}
-          Orçamento
+          Venda
         </label>
       </CheckboxInput>
       <CheckboxInput>
