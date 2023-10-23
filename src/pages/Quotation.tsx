@@ -81,6 +81,7 @@ export default function Quotation() {
   const [description, setDescription] = useState('');
   const [paymentValue, setPaymentValue] = useState('');
   const [paymentTypeValue, setPaymentTypeValue] = useState('');
+
   const quotationData = {
     client_name: clientName,
     client_email: clientEmail,
@@ -210,13 +211,16 @@ export default function Quotation() {
                 <TitleBox>
                   <p>Valor total</p>
                 </TitleBox>
-                <InputSmall
-                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
-                  rows={4}
-                  cols={50}
-                  value={paymentValue}
-                  onChange={(e) => setPaymentValue(e.target.value)}
-                ></InputSmall>
+                <div contentEditable>
+                  <InputSmall
+                    contentEditable="true"
+                    placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
+                    rows={4}
+                    cols={50}
+                    value={paymentValue}
+                    onChange={(e) => setPaymentValue(e.target.value)}
+                  ></InputSmall>
+                </div>
               </Preview>
               <Payment>
                 <TitleBox>
@@ -233,9 +237,10 @@ export default function Quotation() {
               </Payment>
             </QuotationBackground>
 
-            <StyledButton onClick={generatePDF}>
-              {' '}
-              <p>BAIXAR PDF E SALVAR NA DATABASE</p>
+            <StyledButton>
+              <button type="submit" onClick={generatePDF}>
+                <p>SALVAR NA DATABASE E GERAR PDF</p>
+              </button>
             </StyledButton>
           </form>
         </Background>

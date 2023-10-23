@@ -25,10 +25,6 @@ export default function Home() {
             <h1>STEREOLAB</h1>
           </Logo>
           <Paragraph>
-            <Link to="/quotation" style={{ textDecoration: 'none' }}>
-              <p>orçamento</p>
-            </Link>
-            <p>|</p>
             <Link to="/login" style={{ textDecoration: 'none' }}>
               <p>login</p>
             </Link>
@@ -78,11 +74,10 @@ const Logo = styled.div`
 `;
 
 const Paragraph = styled.div`
-  width: 150px;
-
+  width: 500px;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: flex-end;
   p {
     color: #fff;
     font-family: 'Inconsolata', sans-serif;

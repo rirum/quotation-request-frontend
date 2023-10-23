@@ -5,11 +5,12 @@ import { useContext, useState } from 'react';
 import { signIn } from '../services/authApi';
 // import UserContext from '../context/UserContext';
 import { toast } from 'react-toastify';
+import { useAuth } from '../AppContext/Provider';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const { setUserLogged } = useContext(UserContext);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   async function submit(event: any) {
@@ -17,10 +18,12 @@ export default function Login() {
 
     try {
       const userData = await signIn(email, password);
-      // console.log(userData);
-      // setUserLogged(userData);
-      toast('Login realizado com sucesso');
-      navigate('/quotation');
+      console.log(userData);
+      if (userData) {
+        login(userData.user, userData.token);
+        toast('Login realizado com sucesso');
+        navigate('/quotation');
+      }
     } catch (error) {
       if (error) {
         toast('Não foi possivel fazer o login');
@@ -63,6 +66,7 @@ const ContainerForm = styled.div`
   h1 {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 100px;
+    color: white;
   }
   form {
     display: flex;
