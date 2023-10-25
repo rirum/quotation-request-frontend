@@ -1,11 +1,13 @@
 import styled from 'styled-components';
 import LogoStereolab from '../assets/logo_stereolab.png';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import CheckboxGroup from '../components/Checkbox';
 import { postQuotation } from '../services/quotationApi';
 import { toast } from 'react-toastify';
+import { useAuth } from '../AppContext/Provider';
+import axios from 'axios';
 
 function ImageUpload() {
   const [imagens, setImagens] = useState<File[]>([]);
@@ -81,6 +83,11 @@ export default function Quotation() {
   const [description, setDescription] = useState('');
   const [paymentValue, setPaymentValue] = useState('');
   const [paymentTypeValue, setPaymentTypeValue] = useState('');
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [quotationStatus, setQuotationStatus] = useState('ORCAMENTO');
+
+  const { user, token } = useAuth();
 
   const quotationData = {
     client_name: clientName,
@@ -88,7 +95,23 @@ export default function Quotation() {
     client_address: clientAddress,
     quotation_description: description,
     quotation_total_amount: paymentValue,
+    status: quotationStatus,
   };
+
+  useEffect(() => {
+    if (token) {
+      console.log(user);
+    }
+  });
+
+  const handleOptionChange = (option: string | null) => {
+    setSelectedOption(option);
+  };
+
+  const handleStatusChange = (newStatus: string | null) => {
+    setQuotationStatus(newStatus || '');
+  };
+
   const pdfRef = useRef(null);
 
   const generatePDF = async () => {
@@ -129,11 +152,21 @@ export default function Quotation() {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    try {
-      const post = await postQuotation(quotationData);
-      toast('Orçamento criado com sucesso');
-    } catch (error) {
-      console.log(error);
+
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      console.log(quotationData);
+      try {
+        console.log(quotationData);
+
+        const post = await postQuotation(quotationData, token);
+
+        toast('Orçamento criado com sucesso');
+      } catch (error) {
+        console.log({ error });
+      }
+    } else {
+      console.log('Token de autorização inexistente');
     }
   }
   return (
@@ -162,7 +195,10 @@ export default function Quotation() {
                 </NumberData>
               </QuotationHeader>
 
-              <CheckboxGroup />
+              <CheckboxGroup
+                onOptionChange={handleOptionChange}
+                onStatusChange={handleStatusChange}
+              />
 
               <RegistrationData>
                 <InputDataMedium>

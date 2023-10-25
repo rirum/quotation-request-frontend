@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-export default function CheckboxGroup() {
-  const [selectedOption, setSelectedOption] = useState(null);
+export default function CheckboxGroup({
+  onOptionChange,
+  onStatusChange,
+}: {
+  onOptionChange: (option: string) => void;
+  onStatusChange: (option: string) => void;
+}) {
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const handleCheckboxChange = (event: any) => {
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
+    onOptionChange(event.target.value);
   };
 
+  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newStatus = event.target.value;
+    setSelectedOption(event.target.value);
+    onStatusChange(newStatus);
+  };
   return (
     <CheckboxWrapper>
       <CheckboxInput>
         <label>
           <input
             type="checkbox"
-            value="option1"
-            checked={selectedOption === 'option1'}
-            onChange={handleCheckboxChange}
+            value="ORCAMENTO"
+            checked={selectedOption === 'ORCAMENTO'}
+            onChange={handleStatusChange}
           />{' '}
           Orçamento
         </label>
@@ -25,9 +37,9 @@ export default function CheckboxGroup() {
         <label>
           <input
             type="checkbox"
-            value="option2"
-            checked={selectedOption === 'option2'}
-            onChange={handleCheckboxChange}
+            value="VENDA"
+            checked={selectedOption === 'VENDA'}
+            onChange={handleStatusChange}
           />{' '}
           Venda
         </label>
@@ -36,9 +48,9 @@ export default function CheckboxGroup() {
         <label>
           <input
             type="checkbox"
-            value="option3"
-            checked={selectedOption === 'option3'}
-            onChange={handleCheckboxChange}
+            value="LISTA_DE_ESPERA"
+            checked={selectedOption === 'LISTA_DE_ESPERA'}
+            onChange={handleStatusChange}
           />{' '}
           Lista de Espera
         </label>
@@ -47,9 +59,9 @@ export default function CheckboxGroup() {
         <label>
           <input
             type="checkbox"
-            value="option4"
-            checked={selectedOption === 'option4'}
-            onChange={handleCheckboxChange}
+            value="CANCELADA"
+            checked={selectedOption === 'CANCELADA'}
+            onChange={handleStatusChange}
           />{' '}
           Cancelados
         </label>
