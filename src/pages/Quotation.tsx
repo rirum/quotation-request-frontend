@@ -7,6 +7,7 @@ import CheckboxGroup from '../components/Checkbox';
 import { postQuotation } from '../services/quotationApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../AppContext/Provider';
+import { format, formatISO } from 'date-fns';
 import axios from 'axios';
 
 function ImageUpload() {
@@ -83,6 +84,9 @@ export default function Quotation() {
   const [description, setDescription] = useState('');
   const [paymentValue, setPaymentValue] = useState('');
   const [paymentTypeValue, setPaymentTypeValue] = useState('');
+  const [quotationDate, setQuotationDate] = useState(
+    format(new Date(), 'yyyy-MM-dd')
+  );
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [quotationStatus, setQuotationStatus] = useState('ORCAMENTO');
@@ -90,6 +94,7 @@ export default function Quotation() {
   const { user, token } = useAuth();
 
   const quotationData = {
+    quotation_date: new Date(quotationDate).toISOString(),
     client_name: clientName,
     client_email: clientEmail,
     client_address: clientAddress,
@@ -97,12 +102,6 @@ export default function Quotation() {
     quotation_total_amount: paymentValue,
     status: quotationStatus,
   };
-
-  useEffect(() => {
-    if (token) {
-      console.log(user);
-    }
-  });
 
   const handleOptionChange = (option: string | null) => {
     setSelectedOption(option);
@@ -145,6 +144,7 @@ export default function Quotation() {
         unit: 'mm',
         format: 'a5',
       });
+
       pdf.addImage(imgData, 'JPEG', 0, 0, 148, 210);
       pdf.save('documento.pdf');
     });
@@ -155,10 +155,8 @@ export default function Quotation() {
 
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log(quotationData);
-      try {
-        console.log(quotationData);
 
+      try {
         const post = await postQuotation(quotationData, token);
 
         toast('Orçamento criado com sucesso');
@@ -189,7 +187,11 @@ export default function Quotation() {
 
                     <InputData>
                       <p>Data do orçamento:</p>
-                      <input></input>
+                      <input
+                        type="date"
+                        value={quotationDate}
+                        onChange={(e) => setQuotationDate(e.target.value)}
+                      ></input>
                     </InputData>
                   </WrapperInput>
                 </NumberData>
@@ -247,16 +249,14 @@ export default function Quotation() {
                 <TitleBox>
                   <p>Valor total</p>
                 </TitleBox>
-                <div contentEditable>
-                  <InputSmall
-                    contentEditable="true"
-                    placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
-                    rows={4}
-                    cols={50}
-                    value={paymentValue}
-                    onChange={(e) => setPaymentValue(e.target.value)}
-                  ></InputSmall>
-                </div>
+
+                <InputSmall
+                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
+                  rows={4}
+                  cols={50}
+                  value={paymentValue}
+                  onChange={(e) => setPaymentValue(e.target.value)}
+                ></InputSmall>
               </Preview>
               <Payment>
                 <TitleBox>
@@ -329,7 +329,7 @@ const WrapperInput = styled.div`
 const InputData = styled.div`
   display: flex;
   align-items: center;
-  width: 120px;
+  width: 200px;
   margin-left: 50px;
   margin-bottom: 5px;
   p {
@@ -401,7 +401,7 @@ const InputMedium = styled.textarea`
 `;
 
 const Description = styled.div`
-  background-color: yellow;
+  background-color: pink;
   height: 500px;
 `;
 
