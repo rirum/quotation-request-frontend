@@ -4,7 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import CheckboxGroup from '../components/Checkbox';
-import { postQuotation } from '../services/quotationApi';
+import {
+  postQuotation,
+  getLastQuotationNumber,
+} from '../services/quotationApi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../AppContext/Provider';
 import { format, formatISO } from 'date-fns';
@@ -90,6 +93,7 @@ export default function Quotation() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [quotationStatus, setQuotationStatus] = useState('ORCAMENTO');
+  const [quotationNumber, setQuotationNumber] = useState('');
 
   const { user, token } = useAuth();
 
@@ -103,6 +107,14 @@ export default function Quotation() {
     status: quotationStatus,
   };
 
+  useEffect(() => {
+    getNextQuotationNumber().then((nextNumber) => {
+      if (typeof nextNumber === 'number') {
+        setQuotationNumber(nextNumber.toString());
+      }
+    });
+  }, []);
+
   const handleOptionChange = (option: string | null) => {
     setSelectedOption(option);
   };
@@ -111,6 +123,19 @@ export default function Quotation() {
     setQuotationStatus(newStatus || '');
   };
 
+  async function getNextQuotationNumber() {
+    try {
+      const response = await getLastQuotationNumber();
+
+      const lastQuotationNumber = response.data.quotation_number;
+      console.log(lastQuotationNumber);
+      if (typeof lastQuotationNumber === 'number') {
+        return lastQuotationNumber + 1;
+      }
+    } catch (error) {
+      console.error('Erro ao obter número da cotação');
+    }
+  }
   const pdfRef = useRef(null);
 
   const generatePDF = async () => {
@@ -182,7 +207,7 @@ export default function Quotation() {
                   <WrapperInput>
                     <InputData>
                       <p>Número do orçamento:</p>
-                      <input></input>
+                      <h1>{quotationNumber}</h1>
                     </InputData>
 
                     <InputData>
@@ -209,6 +234,7 @@ export default function Quotation() {
                     type="text"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
+                    placeholder="*campo obrigatorio"
                   ></input>
                 </InputDataMedium>
 
@@ -218,7 +244,7 @@ export default function Quotation() {
                     type="text"
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
-                    placeholder="ex: teste@teste.com.br ou 41 99999-9999"
+                    placeholder="ex: exemplo@email.com ou 41 99999-9999 | *campo obrigatorio"
                   ></input>
                 </InputDataMedium>
 
@@ -251,7 +277,7 @@ export default function Quotation() {
                 </TitleBox>
 
                 <InputSmall
-                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço"
+                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço | *campo obrigatório"
                   rows={4}
                   cols={50}
                   value={paymentValue}
@@ -308,7 +334,9 @@ const StyledButton = styled.div`
   display: flex;
   margin: 0 auto;
   margin-top: 15px;
-
+  button {
+    width: 100%;
+  }
   p {
     margin: 0 auto;
     margin-top: 5px;
@@ -329,7 +357,7 @@ const WrapperInput = styled.div`
 const InputData = styled.div`
   display: flex;
   align-items: center;
-  width: 200px;
+  width: 350px;
   margin-left: 50px;
   margin-bottom: 5px;
   p {
@@ -340,7 +368,7 @@ const InputData = styled.div`
 `;
 
 const RegistrationData = styled.div`
-  background-color: aliceblue;
+  background-color: white;
   height: 80px;
   align-content: center;
 `;
@@ -353,7 +381,11 @@ const InputDataMedium = styled.div`
   input {
     width: 450px;
     margin-bottom: 5px;
+    &::placeholder {
+      font-size: 10px;
+    }
   }
+
   p {
     width: 130px;
     font-size: 12px;
@@ -381,7 +413,7 @@ const TitleBox = styled.div`
 `;
 
 const InputMedium = styled.textarea`
-  min-height: 100px;
+  min-height: 300px;
   width: 574px;
   display: flex;
   font-family: 'Inconsolata', sans-serif;
@@ -401,19 +433,19 @@ const InputMedium = styled.textarea`
 `;
 
 const Description = styled.div`
-  background-color: pink;
+  background-color: white;
   height: 500px;
 `;
 
 const Preview = styled.div`
-  background-color: palegreen;
+  background-color: white;
   height: 200px;
   display: flex;
   flex-direction: column;
 `;
 
 const Payment = styled.div`
-  background-color: paleturquoise;
+  background-color: white;
   height: 200px;
 `;
 

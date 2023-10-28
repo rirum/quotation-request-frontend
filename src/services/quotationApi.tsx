@@ -18,3 +18,8 @@ export async function postQuotation(data: QuotationData, token: string) {
   const response = await api.post('/quotation', data, { headers });
   return response.data;
 }
+
+export async function getLastQuotationNumber() {
+  const response = await api.get('/quotation');
+  return response;
+}
