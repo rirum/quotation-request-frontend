@@ -1,7 +1,7 @@
 // import Logo from '../components/Logo';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { signIn } from '../services/authApi';
 // import UserContext from '../context/UserContext';
 import { toast } from 'react-toastify';
@@ -10,6 +10,7 @@ import { useAuth } from '../AppContext/Provider';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -18,9 +19,12 @@ export default function Login() {
 
     try {
       const userData = await signIn(email, password);
-      console.log(userData);
+
       if (userData) {
         login(userData.user, userData.token);
+
+        localStorage.setItem('token', userData.token);
+
         toast('Login realizado com sucesso');
         navigate('/quotation');
       }
@@ -30,6 +34,8 @@ export default function Login() {
       }
     }
   }
+
+  // ...
 
   return (
     <>

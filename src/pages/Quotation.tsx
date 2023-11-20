@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../AppContext/Provider';
 import { format, formatISO } from 'date-fns';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function ImageUpload() {
   const [imagens, setImagens] = useState<File[]>([]);
@@ -94,8 +95,9 @@ export default function Quotation() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [quotationStatus, setQuotationStatus] = useState('ORCAMENTO');
   const [quotationNumber, setQuotationNumber] = useState('');
-
-  const { user, token } = useAuth();
+  const [loggedUser, setLoggedUser] = useState(false);
+  const navigate = useNavigate();
+  const { token, login } = useAuth();
 
   const quotationData = {
     quotation_date: new Date(quotationDate).toISOString(),
@@ -108,6 +110,11 @@ export default function Quotation() {
   };
 
   useEffect(() => {
+    const loggedInUser = localStorage.getItem('token');
+    if (loggedInUser) {
+      setLoggedUser(true);
+    }
+
     getNextQuotationNumber().then((nextNumber) => {
       if (typeof nextNumber === 'number') {
         setQuotationNumber(nextNumber.toString());
@@ -126,9 +133,7 @@ export default function Quotation() {
   async function getNextQuotationNumber() {
     try {
       const response = await getLastQuotationNumber();
-
       const lastQuotationNumber = response.data.quotation_number;
-      console.log(lastQuotationNumber);
       if (typeof lastQuotationNumber === 'number') {
         return lastQuotationNumber + 1;
       }

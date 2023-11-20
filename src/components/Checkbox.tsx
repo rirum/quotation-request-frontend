@@ -10,10 +10,10 @@ export default function CheckboxGroup({
 }) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedOption(event.target.value);
-    onOptionChange(event.target.value);
-  };
+  // const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSelectedOption(event.target.value);
+  //   onOptionChange(event.target.value);
+  // };
 
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newStatus = event.target.value;
