@@ -9,7 +9,7 @@ interface User {
 interface AuthContextProps {
   user: User | null;
   token: string | null;
-  login: (username: string, password: string) => void;
+  login: (token: string) => void;
   logout: () => void;
 }
 
@@ -23,13 +23,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.getItem('token')
   );
 
-  const login = (username: string, password: string) => {
+  const login = (authToken: string) => {
+    // Simule a obtenção dos dados do usuário a partir do token (pode variar dependendo da sua lógica)
+    const decodedToken = decodeToken(authToken);
     const authenticatedUser = {
-      id: 1,
-      email: 'example@example.com',
-      name: 'John Doe',
+      id: decodedToken.id,
+      email: decodedToken.email,
+      name: decodedToken.name,
     };
-    const authToken = 'your_generated_token';
 
     setUser(authenticatedUser);
     setToken(authToken);
@@ -61,4 +62,12 @@ export const useAuth = () => {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
+};
+
+// Função para decodificar o token (dependendo da sua biblioteca JWT)
+const decodeToken = (token: string) => {
+  // Lógica para decodificar o token (usando a biblioteca jwt-decode neste exemplo)
+  // Certifique-se de ter a biblioteca instalada (npm install jwt-decode)
+  const decoded = require('jwt-decode');
+  return decoded(token);
 };

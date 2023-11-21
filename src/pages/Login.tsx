@@ -21,7 +21,7 @@ export default function Login() {
       const userData = await signIn(email, password);
 
       if (userData) {
-        login(userData.user, userData.token);
+        // login(userData.user, userData.token);
 
         localStorage.setItem('token', userData.token);
 
