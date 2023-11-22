@@ -96,6 +96,10 @@ export default function Quotation() {
   const [quotationStatus, setQuotationStatus] = useState('ORCAMENTO');
   const [quotationNumber, setQuotationNumber] = useState('');
   const [loggedUser, setLoggedUser] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [prevNumber, setPrevNumber] = useState<string | null>(null);
+  const [quotationFormNumber, setQuotationFormNumber] = useState('');
+
   const navigate = useNavigate();
   const { token, login } = useAuth();
 
@@ -108,6 +112,35 @@ export default function Quotation() {
     quotation_total_amount: paymentValue,
     status: quotationStatus,
   };
+
+  const startNewQuotation = async () => {
+    try {
+      setClientName('');
+      setClientEmail('');
+      setClientAddress('');
+      setDescription('');
+      setPaymentValue('');
+      setPaymentTypeValue('');
+      setQuotationDate(format(new Date(), 'yyyy-MM-dd'));
+      setSelectedItems([]);
+      setSelectedOption(null);
+      setQuotationStatus('ORCAMENTO');
+      getNextQuotationNumber().then((nextNumber) => {
+        if (typeof nextNumber === 'number') {
+          // Atualiza o estado com o novo número do orçamento
+          setPrevNumber(quotationFormNumber); // Salva o valor anterior antes de reiniciar
+          setQuotationNumber(nextNumber.toString());
+        }
+      });
+
+      // Oculta a mensagem de sucesso
+      setShowSuccessMessage(false);
+    } catch (error) {
+      console.error('Erro ao obter número da cotação', error);
+    }
+  };
+
+  // const clearFormFields = () => {};
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('token');
@@ -134,6 +167,7 @@ export default function Quotation() {
     try {
       const response = await getLastQuotationNumber();
       const lastQuotationNumber = response.data.quotation_number;
+      console.log('Next Quotation Number:', lastQuotationNumber + 1);
       if (typeof lastQuotationNumber === 'number') {
         return lastQuotationNumber + 1;
       }
@@ -189,7 +223,8 @@ export default function Quotation() {
       try {
         const post = await postQuotation(quotationData, token);
 
-        toast('Orçamento criado com sucesso');
+        // toast('Orçamento criado com sucesso');
+        setShowSuccessMessage(true);
       } catch (error) {
         console.log({ error });
       }
@@ -197,121 +232,133 @@ export default function Quotation() {
       console.log('Token de autorização inexistente');
     }
   }
+
   return (
     <>
-      <div ref={pdfRef}>
-        <Background>
-          <Block></Block>
-          <form onSubmit={submit}>
-            <QuotationBackground id="QuotationBackground">
-              <QuotationHeader>
-                <Logo>
-                  <img src={LogoStereolab} alt="logo-stereolab"></img>
-                </Logo>
-                <NumberData>
-                  <WrapperInput>
-                    <InputData>
-                      <p>Número do orçamento:</p>
-                      <h1>{quotationNumber}</h1>
-                    </InputData>
+      {!showSuccessMessage && (
+        <div ref={pdfRef}>
+          <Background>
+            <Block></Block>
+            <form onSubmit={submit}>
+              <QuotationBackground id="QuotationBackground">
+                <QuotationHeader>
+                  <Logo>
+                    <img src={LogoStereolab} alt="logo-stereolab"></img>
+                  </Logo>
+                  <NumberData>
+                    <WrapperInput>
+                      <InputData>
+                        <p>Número do orçamento:</p>
+                        <h1>{quotationNumber}</h1>
+                      </InputData>
 
-                    <InputData>
-                      <p>Data do orçamento:</p>
-                      <input
-                        type="date"
-                        value={quotationDate}
-                        onChange={(e) => setQuotationDate(e.target.value)}
-                      ></input>
-                    </InputData>
-                  </WrapperInput>
-                </NumberData>
-              </QuotationHeader>
+                      <InputData>
+                        <p>Data do orçamento:</p>
+                        <input
+                          type="date"
+                          value={quotationDate}
+                          onChange={(e) => setQuotationDate(e.target.value)}
+                        ></input>
+                      </InputData>
+                    </WrapperInput>
+                  </NumberData>
+                </QuotationHeader>
 
-              <CheckboxGroup
-                onOptionChange={handleOptionChange}
-                onStatusChange={handleStatusChange}
-              />
+                <CheckboxGroup
+                  onOptionChange={handleOptionChange}
+                  onStatusChange={handleStatusChange}
+                />
 
-              <RegistrationData>
-                <InputDataMedium>
-                  <p>Nome:</p>
-                  <input
-                    type="text"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    placeholder="*campo obrigatorio"
-                  ></input>
-                </InputDataMedium>
+                <RegistrationData>
+                  <InputDataMedium>
+                    <p>Nome:</p>
+                    <input
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="*campo obrigatorio"
+                    ></input>
+                  </InputDataMedium>
 
-                <InputDataMedium>
-                  <p>Email ou Whatsapp:</p>
-                  <input
-                    type="text"
-                    value={clientEmail}
-                    onChange={(e) => setClientEmail(e.target.value)}
-                    placeholder="ex: exemplo@email.com ou 41 99999-9999 | *campo obrigatorio"
-                  ></input>
-                </InputDataMedium>
+                  <InputDataMedium>
+                    <p>Telefone/Whatsapp:</p>
+                    <input
+                      type="text"
+                      value={clientEmail}
+                      onChange={(e) => setClientEmail(e.target.value)}
+                      placeholder="ex: 41 99999-9999 | *campo obrigatorio"
+                    ></input>
+                  </InputDataMedium>
 
-                <InputDataMedium>
-                  <p>Endereço:</p>
-                  <input
-                    type="text"
-                    value={clientAddress}
-                    onChange={(e) => setClientAddress(e.target.value)}
-                  ></input>
-                </InputDataMedium>
-              </RegistrationData>
+                  <InputDataMedium>
+                    <p>Cidade - Estado:</p>
+                    <input
+                      type="text"
+                      value={clientAddress}
+                      onChange={(e) => setClientAddress(e.target.value)}
+                    ></input>
+                  </InputDataMedium>
+                </RegistrationData>
 
-              <Description>
-                <TitleBox>
-                  <p>Descrição do orçamento</p>
-                </TitleBox>
-                <InputMedium
-                  placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
-                  rows={4}
-                  cols={50}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                ></InputMedium>
-              </Description>
+                <Description>
+                  <TitleBox>
+                    <p>Descrição do orçamento</p>
+                  </TitleBox>
+                  <InputMedium
+                    placeholder="Digite aqui para editar | Descrição do produto ou serviço (quantidade, material, cores, dimensão, tipo de corte, acabamentos, especificações do projeto)"
+                    rows={4}
+                    cols={50}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  ></InputMedium>
+                </Description>
 
-              <Preview>
-                <TitleBox>
-                  <p>Valor total</p>
-                </TitleBox>
+                <Preview>
+                  <TitleBox>
+                    <p>Valor total</p>
+                  </TitleBox>
 
-                <InputSmall
-                  placeholder="Digite aqui para editar |  Valor total do projeto/serviço | *campo obrigatório"
-                  rows={4}
-                  cols={50}
-                  value={paymentValue}
-                  onChange={(e) => setPaymentValue(e.target.value)}
-                ></InputSmall>
-              </Preview>
-              <Payment>
-                <TitleBox>
-                  <p>Formas de pagamento</p>
-                </TitleBox>
+                  <InputSmall
+                    placeholder="Digite aqui para editar |  Valor total do projeto/serviço | *campo obrigatório"
+                    rows={4}
+                    cols={50}
+                    value={paymentValue}
+                    onChange={(e) => setPaymentValue(e.target.value)}
+                  ></InputSmall>
+                </Preview>
+                <Payment>
+                  <TitleBox>
+                    <p>Formas de pagamento</p>
+                  </TitleBox>
 
-                <InputSmall
-                  placeholder="Digite aqui para editar |  Formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
-                  rows={4}
-                  cols={50}
-                  value={paymentTypeValue}
-                  onChange={(e) => setPaymentTypeValue(e.target.value)}
-                ></InputSmall>
-              </Payment>
-            </QuotationBackground>
+                  <InputSmall
+                    placeholder="Digite aqui para editar |  Formas de pagamento (ex: entrada + 3 parcelas, à vista, boleto)"
+                    rows={4}
+                    cols={50}
+                    value={paymentTypeValue}
+                    onChange={(e) => setPaymentTypeValue(e.target.value)}
+                  ></InputSmall>
+                </Payment>
+              </QuotationBackground>
 
-            <StyledButton>
-              <button type="submit" onClick={generatePDF}>
-                <p>SALVAR NA DATABASE E GERAR PDF</p>
-              </button>
-            </StyledButton>
-          </form>
-        </Background>
-      </div>
+              <StyledButton>
+                <button type="submit" onClick={generatePDF}>
+                  <p>SALVAR NA DATABASE E GERAR PDF</p>
+                </button>
+              </StyledButton>
+            </form>
+          </Background>
+        </div>
+      )}
+      {showSuccessMessage && (
+        <BackgroundSuccessMessage>
+          <p>Orçamento salvo com sucesso! Deseja gravar outro orçamento?</p>
+          <WrapperButton>
+            <button onClick={() => setShowSuccessMessage(false)}>Fechar</button>
+            <button onClick={startNewQuotation}>Novo Orçamento</button>
+          </WrapperButton>
+        </BackgroundSuccessMessage>
+      )}
     </>
   );
 }
@@ -497,5 +544,38 @@ const Background = styled.div`
     border-top: 1px solid #ccc;
     margin: 1em 0;
     padding: 0;
+  }
+`;
+const BackgroundSuccessMessage = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #292826;
+  font-family: 'Inconsolata', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    color: white;
+    font-size: 25px;
+  }
+`;
+const WrapperButton = styled.div`
+  width: 500px;
+  height: 100px;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  button {
+    border-radius: 5px;
+    border: 1px solid #fcba03;
+    background-color: transparent;
+    width: 200px;
+    height: 50px;
+    color: white;
+    transition: background-color 0.3s; /* Adiciona uma transição suave à mudança de cor */
+    &:hover {
+      background-color: #fcba03; /* Muda a cor de fundo ao passar o mouse */
+    }
   }
 `;
