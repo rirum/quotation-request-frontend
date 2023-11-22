@@ -281,17 +281,17 @@ export default function Quotation() {
                   </InputDataMedium>
 
                   <InputDataMedium>
-                    <p>Email ou Whatsapp:</p>
+                    <p>Telefone/Whatsapp:</p>
                     <input
                       type="text"
                       value={clientEmail}
                       onChange={(e) => setClientEmail(e.target.value)}
-                      placeholder="ex: exemplo@email.com ou 41 99999-9999 | *campo obrigatorio"
+                      placeholder="ex: 41 99999-9999 | *campo obrigatorio"
                     ></input>
                   </InputDataMedium>
 
                   <InputDataMedium>
-                    <p>Endereço:</p>
+                    <p>Cidade - Estado:</p>
                     <input
                       type="text"
                       value={clientAddress}
@@ -351,11 +351,13 @@ export default function Quotation() {
         </div>
       )}
       {showSuccessMessage && (
-        <Background>
+        <BackgroundSuccessMessage>
           <p>Orçamento salvo com sucesso! Deseja gravar outro orçamento?</p>
-          <button onClick={() => setShowSuccessMessage(false)}>Fechar</button>
-          <button onClick={startNewQuotation}>Novo Orçamento</button>
-        </Background>
+          <WrapperButton>
+            <button onClick={() => setShowSuccessMessage(false)}>Fechar</button>
+            <button onClick={startNewQuotation}>Novo Orçamento</button>
+          </WrapperButton>
+        </BackgroundSuccessMessage>
       )}
     </>
   );
@@ -542,5 +544,38 @@ const Background = styled.div`
     border-top: 1px solid #ccc;
     margin: 1em 0;
     padding: 0;
+  }
+`;
+const BackgroundSuccessMessage = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #292826;
+  font-family: 'Inconsolata', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    color: white;
+    font-size: 25px;
+  }
+`;
+const WrapperButton = styled.div`
+  width: 500px;
+  height: 100px;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  button {
+    border-radius: 5px;
+    border: 1px solid #fcba03;
+    background-color: transparent;
+    width: 200px;
+    height: 50px;
+    color: white;
+    transition: background-color 0.3s; /* Adiciona uma transição suave à mudança de cor */
+    &:hover {
+      background-color: #fcba03; /* Muda a cor de fundo ao passar o mouse */
+    }
   }
 `;
