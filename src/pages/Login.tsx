@@ -26,7 +26,7 @@ export default function Login() {
         localStorage.setItem('token', userData.token);
 
         toast('Login realizado com sucesso');
-        navigate('/quotation');
+        navigate('/intranet');
       }
     } catch (error) {
       if (error) {

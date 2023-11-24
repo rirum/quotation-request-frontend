@@ -24,7 +24,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   const login = (authToken: string) => {
-    // Simule a obtenção dos dados do usuário a partir do token (pode variar dependendo da sua lógica)
     const decodedToken = decodeToken(authToken);
     const authenticatedUser = {
       id: decodedToken.id,
@@ -64,10 +63,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Função para decodificar o token (dependendo da sua biblioteca JWT)
 const decodeToken = (token: string) => {
-  // Lógica para decodificar o token (usando a biblioteca jwt-decode neste exemplo)
-  // Certifique-se de ter a biblioteca instalada (npm install jwt-decode)
   const decoded = require('jwt-decode');
   return decoded(token);
 };
