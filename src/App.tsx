@@ -2,12 +2,13 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Intranet from './pages/Intranet';
 import Quotation from './pages/Quotation';
 import Page404 from './pages/Page404';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './AppContext/Provider';
-import { ProtectedRoute } from './pages/ProtectedRoute';
+// import { ProtectedRoute } from './pages/ProtectedRoute';
 
 function App() {
   return (
@@ -30,14 +31,10 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />}></Route>
               <Route path="/login" element={<Login />}></Route>
-              <Route
-                path="/quotation"
-                element={
-                  <ProtectedRoute>
-                    <Quotation />
-                  </ProtectedRoute>
-                }
-              ></Route>
+
+              <Route path="/intranet" element={<Intranet />}></Route>
+
+              <Route path="/quotation" element={<Quotation />}></Route>
               <Route path="/page404" element={<Page404 />}></Route>
             </Routes>
           </AuthProvider>

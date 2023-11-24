@@ -127,25 +127,24 @@ export default function Quotation() {
       setQuotationStatus('ORCAMENTO');
       getNextQuotationNumber().then((nextNumber) => {
         if (typeof nextNumber === 'number') {
-          // Atualiza o estado com o novo número do orçamento
-          setPrevNumber(quotationFormNumber); // Salva o valor anterior antes de reiniciar
+          setPrevNumber(quotationFormNumber);
           setQuotationNumber(nextNumber.toString());
         }
       });
 
-      // Oculta a mensagem de sucesso
       setShowSuccessMessage(false);
     } catch (error) {
       console.error('Erro ao obter número da cotação', error);
     }
   };
 
-  // const clearFormFields = () => {};
-
   useEffect(() => {
     const loggedInUser = localStorage.getItem('token');
+
     if (loggedInUser) {
       setLoggedUser(true);
+    } else {
+      navigate('/page404');
     }
 
     getNextQuotationNumber().then((nextNumber) => {
@@ -167,7 +166,7 @@ export default function Quotation() {
     try {
       const response = await getLastQuotationNumber();
       const lastQuotationNumber = response.data.quotation_number;
-      console.log('Next Quotation Number:', lastQuotationNumber + 1);
+      // console.log('Next Quotation Number:', lastQuotationNumber + 1);
       if (typeof lastQuotationNumber === 'number') {
         return lastQuotationNumber + 1;
       }
@@ -216,12 +215,13 @@ export default function Quotation() {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const currentToken = localStorage.getItem('token');
 
-    if (token) {
+    if (currentToken) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       try {
-        const post = await postQuotation(quotationData, token);
+        const post = await postQuotation(quotationData, currentToken);
 
         // toast('Orçamento criado com sucesso');
         setShowSuccessMessage(true);
@@ -230,6 +230,7 @@ export default function Quotation() {
       }
     } else {
       console.log('Token de autorização inexistente');
+      navigate('/page404');
     }
   }
 
@@ -354,7 +355,7 @@ export default function Quotation() {
         <BackgroundSuccessMessage>
           <p>Orçamento salvo com sucesso! Deseja gravar outro orçamento?</p>
           <WrapperButton>
-            <button onClick={() => setShowSuccessMessage(false)}>Fechar</button>
+            <button onClick={() => setShowSuccessMessage(false)}>Logout</button>
             <button onClick={startNewQuotation}>Novo Orçamento</button>
           </WrapperButton>
         </BackgroundSuccessMessage>
@@ -573,9 +574,9 @@ const WrapperButton = styled.div`
     width: 200px;
     height: 50px;
     color: white;
-    transition: background-color 0.3s; /* Adiciona uma transição suave à mudança de cor */
+    transition: background-color 0.3s;
     &:hover {
-      background-color: #fcba03; /* Muda a cor de fundo ao passar o mouse */
+      background-color: #fcba03;
     }
   }
 `;
